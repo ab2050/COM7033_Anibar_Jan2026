@@ -1,19 +1,33 @@
 import register
 import login
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session #actually stores data
+from flask_session import Session #where data is stored, redis or user cookies
 import adminthings
 from passwordAuth import passwordstrength
 from entryLogs import successlog,faillog,auditlog
 import showgraphs
 from sqliteDBforDeleteReason import add_Reason
 import userActions
+import os
+from dotenv import load_dotenv
+from redisstart import red
 
-# username - ad, password - pwd, role - admin || name - gen password - Word123$% role - user
+load_dotenv()
+# username - admintrial, password - Word123$%, role - admin || name - gen password - Word123$% role - user
 # database= "abcreates",user = "ab",password = "password"
 
 # NEED TO ADD SESSIONS
 # user to try redis on - username - user, password - word 
+
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.getenv("flaskKey")
+app.config["SESSION_TYPE"] = "redis"
+app.config["SESSION_REDIS"] = red #imported from redisstart
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_COOKIE_HTTPONLY"] = True #prevents XSS attacks
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax" #prevents CSRF attacks
+
+Session(app)
 
 @app.route("/")
 def home():
@@ -43,11 +57,15 @@ def existing():
             return render_template("login.html",error = "Too many failed attempts, retry after 2 mins")
 
         elif result.lower() == "admin":
+            session["username"]=name
+            session["role"]="admin"
             auditlog.info(f"admin {name} logged in")
             successlog.info(f"Successful login")
             return redirect(url_for("admin"))
         
         elif result.lower() == "user":
+            session["username"]=name
+            session["role"]="user"
             auditlog.info(f"user {name} has logged in")
             successlog.info(f"Successful login")
             return redirect(url_for("users"))
@@ -79,6 +97,11 @@ def users():
 
 @app.route("/admin")
 def admin():
+    if "username" not in session:
+        return redirect(url_for("home"))
+    
+    if session.get("role")!="admin":
+        return render_template("Error403.html"),403 #industry standard i guess
     return render_template("admin.html")
 
 @app.route("/admin/userDeleted")
@@ -114,6 +137,13 @@ def userDelete():
 
         return render_template("deleted.html")
     return render_template("delete_account.html")
+
+@app.route("/logout")
+def logout():
+    name = session.get("username")
+    session.clear()
+    auditlog.info(f"{name} logged out")
+    return redirect(url_for("home"))
 
 app.run(debug=True)
 '''n = input("HI, EXISTING USER (1) OR WANNA CREATE A NEW ONE (2) ? (1/2)")

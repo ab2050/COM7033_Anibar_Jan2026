@@ -39,7 +39,7 @@ def show():
     conn = create()
     cursor = conn.cursor()
 
-    cursor.execute("select username,password,role,join_date,exit_date from storeData")
+    cursor.execute("select username,role,join_date,exit_date from storeData")
     # select * causes the table to be misaligned, like username shows serial number, password shows username, role shows password
     # and all, need to figure out why
     conn.commit()
