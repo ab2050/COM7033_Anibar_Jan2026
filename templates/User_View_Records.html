@@ -6,14 +6,22 @@
     <title>Document</title>
 </head>
 <body>
-    <h2>What do you want to do today ?</h2>
-    <a href="{{ url_for('userDelete') }}">Delete myself</a>
-    <br><br>
+    <h2>Your Record</h2>
+
+    {% if record %}
+
+    <p>Name: {{ record.name }}</p>
+    <p>Age: {{ record.age }}</p>
+    <p>Created: {{ record.createdOn }}</p>
+    <p>Last Updated: {{ record.updatedOn }}</p>
+
+    {% else %}
+
+    <p>No record found.</p>
+
+    {% endif %}
+
     <a href="{{ url_for('home') }}">Go home instead</a>
-    <br><br>
-    <a href="{{ url_for('userAddsData')}}">Add data</a>"
-    <br><br>
-    <a href="{{ url_for('userViewsData')}}">View data</a>"
     <br><br>
     <a href="{{ url_for('logout')}}">Log out</a>"
 </body>

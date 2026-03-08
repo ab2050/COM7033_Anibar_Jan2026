@@ -12,9 +12,11 @@ import os
 from dotenv import load_dotenv
 from redisstart import red
 from flask_wtf.csrf import CSRFProtect
+import mongoconnect
+#from mongoconnect import patdata
 
 load_dotenv()
-# username - admintrial, password - Word123$%, role - admin || name - gen password - Word123$% role - user
+# username - admintrial, password - Word123$%, role - admin || name - usertry/usertry1 ... password - Word123$% role - user
 # thedoc, Word123$%, - medical
 # database= "abcreates",user = "ab",password = "password"
 
@@ -114,6 +116,24 @@ def users():
         #someone just pasting in the link
         return redirect(url_for("home"))
     return render_template("users.html")
+
+@app.route("/user/upload", methods=["GET","POST"])
+def userAddsData():
+    if "username" not in session or session.get("role") !="user":
+        return redirect(url_for("home")),403
+    
+    if request.method== "POST":
+        mongoconnect.patientAddsData(session["username"],request.form["name"],request.form["age"])
+
+        return redirect(url_for("users"))
+    return render_template("patient_upload.html")
+
+@app.route("/user/view")
+def userViewsData():
+    if "username" not in session or session.get("role")!="user":
+        return redirect(url_for("home"))
+    
+    return render_template("User_View_Records.html",record=mongoconnect.individual(session["username"]))
 
 @app.route("/admin")
 def admin():
