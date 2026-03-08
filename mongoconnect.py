@@ -33,16 +33,17 @@ def patientAddsData(username,name,age):
         },upsert=True) # will only create one record per id
 
 def medAddsData(data):
-    val = {
-        "name":data.get("name"),
-        "age":data.get("age"),
-        "disease":data.get("disease"),
-        "medicines":data.get("medicines"),
-        "notes":data.get("notes"),
-        "createdOn":datetime.now(),
-        "updatedOn":datetime.now()
-    }
-    return patdata.insert_one(val)
+    patdata.update_one(
+        {"_id":data.get("username")},
+        {
+            "$set":{
+                "disease":data.get("disease"),
+                "medicines":data.get("medicines"),
+                "notes":data.get("notes"),
+                "updatedOn":datetime.now()
+            }
+        }
+    )
 
 def showpatients():
     return list(patdata.find())

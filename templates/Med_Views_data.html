@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Patient Records</title>
+</head>
+<body>
+
+    <h2>All Patient Records</h2>
+
+    {% if record %}
+
+    <table border="1">
+
+    <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Disease</th>
+        <th>Medicines</th>
+        <th>Notes</th>
+    </tr>
+
+    {% for i in record %}
+
+    <tr>
+        <td>{{ i.name }}</td>
+        <td>{{ i.age }}</td>
+        <td>{{ i.disease }}</td>
+        <td>{{ i.medicines }}</td>
+        <td>{{ i.notes }}</td>
+    </tr>
+
+    {% endfor %}
+
+    </table>
+
+    {% else %}
+
+    <p>No patient records found.</p>
+
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('medic') }}">Back</a>
+    <br><br>
+    <a href="{{ url_for('logout')}}">Log out</a>"
+
+</body>
+</html>
+</body>
+</html>

@@ -191,6 +191,29 @@ def medic():
         return redirect(url_for("home"))
     return render_template("medic.html")
 
+@app.route("/medic/edit", methods=["GET","POST"])
+def medEditsData():
+    if "username" not in session or session.get("role")!="medical":
+        return redirect(url_for("home"))
+    if request.method=="POST":
+        data ={
+            "username":request.form["username"],
+            "disease":request.form["disease"],
+            "medicines":request.form["medicines"],
+            "notes":request.form["notes"]
+        }
+        mongoconnect.medAddsData(data)
+        return redirect(url_for("medic"))
+    return render_template("medic_upload.html")
+
+@app.route("/medic/view")
+def medViewsData():
+    if "username" not in session or session.get("role") != "medical":
+        return redirect(url_for("home"))
+    
+    records = mongoconnect.showpatients()
+    return render_template("Med_Views_data.html",record=records)
+
 @app.route("/delete",methods=["GET","POST"])
 def userDelete():
     if "username" not in session:
