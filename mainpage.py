@@ -15,6 +15,7 @@ from flask_wtf.csrf import CSRFProtect
 
 load_dotenv()
 # username - admintrial, password - Word123$%, role - admin || name - gen password - Word123$% role - user
+# thedoc, Word123$%, - medical
 # database= "abcreates",user = "ab",password = "password"
 
 # NEED TO ADD TALISMAN <- MUST
@@ -77,6 +78,14 @@ def existing():
             auditlog.info(f"user {name} has logged in")
             successlog.info(f"Successful login")
             return redirect(url_for("users"))
+        
+        elif result.lower()=="medical":
+            session.clear()
+            session["username"]=name
+            session["role"]="medical"
+            auditlog.info(f"Medical staff {name} logged in")
+            successlog.info(f"Successful login")
+            return redirect(url_for("medic"))
         
     return render_template("login.html")
 
@@ -155,6 +164,12 @@ def adminanalytics():
         return render_template("Error403.html"),403
     graph = showgraphs.analytics()
     return render_template("analytics.html",data=graph)
+
+@app.route("/medic")
+def medic():
+    if "username" not in session:
+        return redirect(url_for("home"))
+    return render_template("medic.html")
 
 @app.route("/delete",methods=["GET","POST"])
 def userDelete():

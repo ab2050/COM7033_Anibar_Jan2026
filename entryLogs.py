@@ -1,5 +1,5 @@
 import logging
-#add all to a data lake ?
+#add all to a data lake maybe ?
 
 successlog = logging.getLogger("successlog")
 successlog.setLevel(logging.INFO)#check moodle for setlevel info details
