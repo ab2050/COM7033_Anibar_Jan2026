@@ -236,7 +236,8 @@ def logout():
     auditlog.info(f"{name} logged out")
     return redirect(url_for("home"))
 
-app.run(debug=True)
+if __name__ == "__main__": #otherwise tests will freeze
+    app.run(debug=True)
 '''n = input("HI, EXISTING USER (1) OR WANNA CREATE A NEW ONE (2) ? (1/2)")
 
 if not n.isdigit():
