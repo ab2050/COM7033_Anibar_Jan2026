@@ -16,10 +16,16 @@ cursor = conn.cursor()
 #conn.close()
 
 def addemails():
-    cursor.execute("ALTER TABLE storeData ADD COLUMN email TEXT UNIQUE")
+    cursor.execute("ALTER TABLE storeData ADD COLUMN email TEXT")
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def removeconstraint():
+    cursor.execute("ALTER TABLE storeData DROP CONSTRAINT storedata_email_key")
     conn.commit()
     cursor.close()
     conn.close()
 
 if __name__ == "__main__":
-    addemails()
+    removeconstraint()

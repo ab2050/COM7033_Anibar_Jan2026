@@ -18,6 +18,8 @@ import otp #gets and verifies otp
 from datetime import timedelta #for session timeout
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import io
+import csv
 #from mongoconnect import patdata
 
 load_dotenv()
@@ -97,6 +99,14 @@ def existing():
             auditlog.info(f"user {name} has logged in")
             successlog.info(f"Successful login")
             return redirect(url_for("users"))
+        
+        elif result.lower() == "admin":
+            session.clear()
+            session["username"]=name
+            session["role"]="admin"
+            auditlog.info(f"admin {name} has logged in")
+            successlog.info(f"Successful login")
+            return redirect(url_for("admin"))
         
         else:
             session.clear() # prevents session fixation attacks,although flask usually does so by itself
@@ -256,6 +266,32 @@ def admin():
     if session.get("role")!="admin":
         return render_template("Error403.html"),403 #industry standard i guess
     return render_template("admin.html")
+
+@app.route("/admin/importusers",methods=["GET","POST"])
+def importusers():
+    if "username" not in session:
+        return redirect(url_for("home"))
+    
+    if session.get("role")!="admin":
+        return render_template("Error403.html"),403
+    
+    if request.method == "POST":
+        file = request.files["users"]
+        stream = io.StringIO(file.stream.read().decode("utf-8"))
+        reader = csv.DictReader(stream)
+
+        success,fail = 0,0
+        for i in reader:
+            result = register.register(i["username"],i["password"],i["email"])
+            if result:
+                success +=1
+            else:
+                fail+=1
+
+        auditlog.info(f"admin {session["username"]} imported a list of {success} users")
+        return render_template("importusers.html",success=success)
+    
+    return render_template("importusers.html")
 
 @app.route("/admin/userDeleted")
 def adminUserExitReason():

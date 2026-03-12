@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Import Users</title></head>
+<body>
+    <h2>Import Users via CSV</h2>
+    {% if success is defined %}
+        <p style="color:green;">{{ success }} users added</p>
+    {% endif %}
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="file" name="users" accept=".csv" required>
+        <button type="submit">Import</button>
+    </form>
+    <a href="{{ url_for('admin') }}">Back</a>
+</body>
+</html>
