@@ -1,21 +1,23 @@
-import register #add documentation
-import login
+import register # to allow new users to register, gets register method which hashes password and stores data in postgresql
+import login # imports userlogin which verifies password hash, useremail to get user email for MFA
 from flask import Flask, render_template, request, redirect, url_for, session #actually stores data
 from flask_session import Session #where data is stored, redis or user cookies
-import adminthings
-from passwordAuth import passwordstrength
-from entryLogs import successlog,faillog,auditlog
-import showgraphs
-from sqliteDBforDeleteReason import add_Reason
-import userActions
-import os
-from dotenv import load_dotenv
-from redisstart import red
-from flask_wtf.csrf import CSRFProtect
-import mongoconnect
-import emails
-import otp
-from datetime import timedelta
+import adminthings #admin funcitionalities like show logs, show delete reasons,among others
+from passwordAuth import passwordstrength #to ensure new users' passwords are strong
+from entryLogs import successlog,faillog,auditlog #logs all successes, failures and actions. Audit log is mandated by GDPR
+import showgraphs #admin functionality
+from sqliteDBforDeleteReason import add_Reason #stores reasons for users leaving
+import userActions #currently only allows deleting own data
+import os #for dotenv, flask secret key is stored in env for securtiy
+from dotenv import load_dotenv #to read .env file
+from redisstart import red #gets the connector for redis, session cookies are stored here
+from flask_wtf.csrf import CSRFProtect #CSRF protection
+import mongoconnect #allows medical staff to store patient health records, and users to add own data
+import emails #sends otp via emails
+import otp #gets and verifies otp
+from datetime import timedelta #for session timeout
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 #from mongoconnect import patdata
 
 load_dotenv()
@@ -41,6 +43,8 @@ app.config["WTF_CSRF_ENABLED"] = True #better CSRF protection, does not rely on 
 Session(app)
 csrf = CSRFProtect(app)
 
+iplimiter = Limiter(get_remote_address, app=app, default_limits=["400 per day"])
+
 @app.before_request
 def timeouts():
     if "username" in session or "mfaname" in session:
@@ -54,6 +58,7 @@ def home():
     return render_template("index.html")
 
 @app.route("/existing",methods=["GET","POST"])
+@iplimiter.limit("5 per minute")
 def existing():
     if request.method == "POST":
         name = request.form["name"]
@@ -117,6 +122,7 @@ def existing():
     return render_template("login.html")
 
 @app.route("/mfa", methods=["GET","POST"])
+@iplimiter.limit("5 per minute")
 def mfa():
     if "mfaname" not in session:
         return redirect(url_for("home"))
@@ -153,6 +159,7 @@ def mfa():
     return render_template("mfa.html")
 
 @app.route("/register", methods = ["GET","POST"])
+@iplimiter.limit("5 per minute")
 def newUser():
     if request.method == "POST":
         name = request.form["name"]
