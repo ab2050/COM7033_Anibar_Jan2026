@@ -3,7 +3,7 @@ import login # imports userlogin which verifies password hash, useremail to get 
 from flask import Flask, render_template, request, redirect, url_for, session #actually stores data
 from flask_session import Session #where data is stored, redis or user cookies
 import adminthings #admin funcitionalities like show logs, show delete reasons,among others
-from passwordAuth import passwordstrength #to ensure new users' passwords are strong
+import passwordAuth #to ensure new users' passwords are strong
 from entryLogs import successlog,faillog,auditlog #logs all successes, failures and actions. Audit log is mandated by GDPR
 import showgraphs #admin functionality
 from sqliteDBforDeleteReason import add_Reason #stores reasons for users leaving
@@ -168,7 +168,11 @@ def newUser():
 
         if not emails.verifymail(mail):
             return render_template("register.html",error="Wrong email format",name=name)
-        if not passwordstrength(password):
+        
+        if passwordAuth.checkpasswordleaked(password):
+            return render_template("register.html",error="Password has already been breached",name=name)
+        
+        if not passwordAuth.passwordstrength(password):
             return render_template("register.html",error="Password not strong",name=name)
 
         adduser = register.register(name,password,mail)
