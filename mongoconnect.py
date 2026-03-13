@@ -19,13 +19,14 @@ db = mongo["health_management"]
 patdata = db["patients"]
 atexit.register(mongo.close)
 
-def patientAddsData(username,name,age):
+def patientAddsData(username,name,age,sex):
     patdata.update_one(
         {"_id":username},
         {
             "$set":{
                 "name":name,
                 "age":age,
+                "sex": sex,
                 "updatedOn":datetime.now()
             },
             "$setOnInsert":{
@@ -35,15 +36,18 @@ def patientAddsData(username,name,age):
 
 def medAddsData(data):
     patdata.update_one(
-        {"_id":data.get("username")},
+        {"_id": data.get("username")},
         {
-            "$set":{
-                "disease":encrypt(data.get("disease")),
-                "medicines":encrypt(data.get("medicines")),
-                "notes":encrypt(data.get("notes")),
-                "updatedOn":datetime.now()
+            "$set": {
+                "disease": encrypt(data.get("disease")),
+                "medicines": encrypt(data.get("medicines")),
+                "notes": encrypt(data.get("notes")),
+                "bloodPressure": data.get("bp"),
+                "cholesterol": data.get("cholesterol"),
+                "restingECG": data.get("ecg"),
+                "updatedOn": datetime.now()
             }
-        },upsert=True)
+        }, upsert=True)
 
 def showpatients():
     patients =  list(patdata.find())

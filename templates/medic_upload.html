@@ -8,23 +8,39 @@
 <body>
     <form method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
+        
         <label>Patient Username</label>
         <input type="text" name="username" required>
         <br><br>
 
-        <label>Disease</label>
+        <label>Blood Pressure</label>
+        <input type="text" name="bp">
+        <br><br>
+
+        <label>Cholesterol</label>
+        <input type="text" name="cholesterol">
+        <br><br>
+
+        <label>Resting ECG</label>
+        <select name="ecg">
+            <option value="Normal">Normal</option>
+            <option value="ST">ST</option>
+            <option value="LVH">LVH</option>
+        </select>
+        <br><br>
+
+        <label>Diagnosis</label>
         <input type="text" name="disease" required>
         <br><br>
-        
+
         <label>Medicines</label>
         <input type="text" name="medicines" required>
         <br><br>
 
         <label>Notes</label>
-        <input type="text" name="notes" required>
+        <textarea name="notes"></textarea>
         <br><br>
-        
+
         <button type="submit">Submit</button>
     </form>
     <br><br>

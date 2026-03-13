@@ -293,6 +293,39 @@ def importusers():
     
     return render_template("importusers.html")
 
+@app.route("/admin/importpatients", methods=["GET","POST"])
+def importpatients():
+    if "username" not in session:
+        return redirect(url_for("home"))
+    
+    if session.get("role") != "admin":
+        return render_template("Error403.html"), 403
+    
+    if request.method == "POST":
+        file = request.files["patients"]
+        stream = io.StringIO(file.stream.read().decode("utf-8"))
+        reader = csv.DictReader(stream)
+
+        success = 0
+        for r in reader:
+            mongoconnect.patientAddsData(r["Username"],r["Username"],r["Age"],r["Sex"])
+            data = {
+                "username": r["Username"],
+                "disease": r["Diagnosis"],
+                "medicines": r["Medicines"],
+                "notes": r["Notes"],
+                "bp": r["RestingBP"],
+                "cholesterol": r["Cholesterol"],
+                "ecg": r["RestingECG"]
+            }
+            mongoconnect.medAddsData(data)
+            success += 1
+
+        auditlog.info(f"admin {session['username']} imported {success} patient records")
+        return render_template("importpatients.html", success=success)
+    
+    return render_template("importpatients.html")
+
 @app.route("/admin/userDeleted")
 def adminUserExitReason():
     if "username" not in session:

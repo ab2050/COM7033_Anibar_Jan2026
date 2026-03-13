@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Import Patients</title>
+</head>
+<body>
+    <h2>Import Patient Records via CSV</h2>
+
+    {% if success %}
+        <p style="color:green;">{{ success }} patient records imported successfully</p>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="file" name="patients" accept=".csv" required>
+        <br><br>
+        <button type="submit">Import</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('admin') }}">Back to Admin</a>
+</body>
+</html>
