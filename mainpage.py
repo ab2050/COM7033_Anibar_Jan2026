@@ -1,6 +1,6 @@
 import register # to allow new users to register, gets register method which hashes password and stores data in postgresql
 import login # imports userlogin which verifies password hash, useremail to get user email for MFA
-from flask import Flask, render_template, request, redirect, url_for, session #actually stores data
+from flask import Flask, render_template, request, redirect, url_for, session, Response #actually stores data
 from flask_session import Session #where data is stored, redis or user cookies
 import adminthings #admin funcitionalities like show logs, show delete reasons,among others
 import passwordAuth #to ensure new users' passwords are strong
@@ -325,6 +325,28 @@ def importpatients():
         return render_template("importpatients.html", success=success)
     
     return render_template("importpatients.html")
+
+@app.route("/admin/downloadPatientrecords")
+def admindownloadrecords():
+    if "username" not in session:
+        return redirect(url_for("home"))
+    
+    if session.get("role")!="admin":
+        return render_template("Error403.html"),403
+    
+    patients = mongoconnect.showpatients()
+    output = io.StringIO()
+    write = csv.writer(output)
+    write.writerow(["Username", "Name", "Age", "Sex", "Blood Pressure", "Cholesterol", "ECG", "Diagnosis", "Medicines", "Notes", "Created", "Updated"])
+    for p in patients:
+        write.writerow([p.get("_id", ""),p.get("name", ""),p.get("age", ""),p.get("sex", ""),
+                                p.get("bloodPressure", ""),p.get("cholesterol", ""),p.get("restingECG", ""),
+                                p.get("disease", ""),p.get("medicines", ""),p.get("notes", ""),p.get("createdOn", ""),
+                                p.get("updatedOn", "")])
+            
+    output.seek(0)
+    auditlog.info(f"{session["username"]} created a csv of patient records")
+    return Response(output.getvalue(), mimetype="text/csv",headers={"Content-Disposition": "attachment; filename=patients.csv"})
 
 @app.route("/admin/userDeleted")
 def adminUserExitReason():
