@@ -63,6 +63,16 @@ def show_logs():
     cursor.close()
     conn.close()'''
 
+def showdocs():
+    conn = create()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT username FROM storeData WHERE role = 'medical'")
+    doctors = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return doctors
+
 if __name__ == "__main__":
     #create()
     makeTables() #get a better way to create the tables

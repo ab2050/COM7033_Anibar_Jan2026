@@ -17,7 +17,18 @@ def connector():
 mongo = connector()
 db = mongo["health_management"]
 patdata = db["patients"]
+appointments = db["appointments"]
+
 atexit.register(mongo.close)
+
+def makeappointment(patname, docname, date, time, reason):
+    appointments.insert_one({"patient": patname,"doctor": docname,"date": date,"time": time,"reason": reason})
+
+def patientseeappointments(patname):
+    return list(appointments.find({"patient":patname}))
+
+def docseesappointments(docname):
+    return list(appointments.find({"doctor":docname}))
 
 def patientAddsData(username,name,age,sex):
     patdata.update_one(

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Appointment</title>
+</head>
+<body>
+    <h2>Book Appointment</h2>
+
+    {% if message %}<p style="color:green;">{{ message }}</p>{% endif %}
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label>Choose Doctor</label>
+        <select name="doctor">
+            <option value="">Any</option>
+            {% for doc in docs %}
+            <option value="{{ doc }}">{{ doc }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <label>Date</label>
+        <input type="date" name="date" required>
+        <br><br>
+
+        <label>Time</label>
+        <input type="time" name="time" required>
+        <br><br>
+
+        <label>Reason for visit</label>
+        <textarea name="reason" required placeholder="Reason for visit"></textarea>
+        <br><br>
+
+        <button type="submit">Book Appointment</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('users') }}">Back</a>
+</body>
+</html>

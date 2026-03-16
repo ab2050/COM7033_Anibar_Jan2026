@@ -4,33 +4,152 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Patient Records</title>
-</head>
-<body>
-    <h2>All Patient Records</h2>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <div id="records"></div>
-    <p id="error" style="color:red;"></p>
+        body {
+            font-family: sans-serif;
+            background-color:#2c3e50;
+            color: #333;
+            padding: 40px 20px;
+        }
 
-    <br>
-    <a href="{{ url_for('medic') }}">Back</a>
-    <br><br>
-    <a href="{{ url_for('logout') }}">Log out</a>
-
-    <script>
-        async function patientdata() 
-        {
-            const a = await fetch("/api/medic/view")
-            const data = await a.json()
-
-            const doc = document.getElementById("records")
-            let table = "<table border='1'><tr><th>Username</th><th>Disease</th><th>Medicines</th><th>Notes</th></tr>"
-            data.records.forEach(r => {table += `<tr><td>${r._id}</td><td>${r.disease || "N/A"}</td><td>${r.medicines || "N/A"}</td>
-                <td>${r.notes || "N/A"}</td></tr>`})
-            table += "</table>"
-            doc.innerHTML = table
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
             
         }
-        patientdata()
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 26px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 11px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f7f9fc;
+        }
+
+        tr:hover {
+            background-color: #eaf4fb;
+        }
+
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            padding: 9px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-back {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-logout {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-logout:hover {
+            background-color: #c0392b;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>All Patient Records</h2>
+
+        <div id="records"></div>
+        <p id="error"></p>
+
+        <div class="nav-links">
+            <a href="{{ url_for('medic') }}" class="btn-back">← Back</a>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Log Out</a>
+        </div>
+    </div>
+
+    <script>
+        async function patientdata() {
+            try {
+                const a = await fetch("/api/medic/view");
+                const data = await a.json();
+
+                const doc = document.getElementById("records");
+                let table = `
+                    <table>
+                        <tr>
+                            <th>Username</th>
+                            <th>Disease</th>
+                            <th>Medicines</th>
+                            <th>Notes</th>
+                        </tr>`;
+
+                data.records.forEach(r => {
+                    table += `
+                        <tr>
+                            <td>${r._id}</td>
+                            <td>${r.disease || "N/A"}</td>
+                            <td>${r.medicines || "N/A"}</td>
+                            <td>${r.notes || "N/A"}</td>
+                        </tr>`;
+                });
+
+                table += "</table>";
+                doc.innerHTML = table;
+
+            } catch (err) {
+                document.getElementById("error").textContent = "Failed to load records. Please try again.";
+            }
+        }
+        patientdata();
     </script>
 </body>
 </html>

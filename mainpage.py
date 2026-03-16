@@ -20,6 +20,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import io
 import csv
+import dbcreator as dbc
+import random
 #from mongoconnect import patdata
 
 load_dotenv()
@@ -99,15 +101,7 @@ def existing():
             auditlog.info(f"user {name} has logged in")
             successlog.info(f"Successful login")
             return redirect(url_for("users"))
-        
-        elif result.lower() == "admin":
-            session.clear()
-            session["username"]=name
-            session["role"]="admin"
-            auditlog.info(f"admin {name} has logged in")
-            successlog.info(f"Successful login")
-            return redirect(url_for("admin"))
-        
+                
         else:
             session.clear() # prevents session fixation attacks,although flask usually does so by itself
             usermail = login.useremail(name)
@@ -239,6 +233,35 @@ def users():
         #someone just pasting in the link
         return redirect(url_for("home"))
     return render_template("users.html")
+
+@app.route("/user/book",methods=["GET","POST"])
+def userbooksappointment():
+    if "username" not in session or session.get("role") !="user": #show flash message
+        return redirect(url_for("home")),403
+    
+    docs = dbc.showdocs()
+
+    if request.method == "POST":
+        doc = request.form.get("doctor")
+        date = request.form["date"]
+        time = request.form["time"]
+        reason = request.form["reason"]
+
+        if not doc:
+            doc = random.choice(docs)
+
+        mongoconnect.makeappointment(session["username"],doc,date,time,reason)
+        auditlog.info(f"Patient {session['username']} booked appointment with {doc}")
+        return render_template("bookappointment.html", message=f"Appointment booked with Dr.{doc}")
+    return render_template("bookappointment.html",docs=docs)
+
+@app.route("/user/viewapps")
+def userseesapps():
+    if "username" not in session or session.get("role") !="user": #show flash message
+        return redirect(url_for("home")),403
+    
+    apps = mongoconnect.patientseeappointments(session["username"])
+    return render_template("userappointments.html", apps=apps)   
 
 @app.route("/user/upload", methods=["GET","POST"])
 def userAddsData():
@@ -394,6 +417,14 @@ def medic():
     if "username" not in session:
         return redirect(url_for("home"))
     return render_template("medic.html")
+
+@app.route("/medic/viewapps")
+def medseesapps():
+    if "username" not in session or session.get("role") !="medical":
+        return redirect(url_for("home")),403
+    
+    apps = mongoconnect.docseesappointments(session["username"])
+    return render_template("docappointments.html", apps=apps)  
 
 @app.route("/medic/edit", methods=["GET","POST"])
 def medEditsData():

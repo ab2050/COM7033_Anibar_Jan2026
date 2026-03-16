@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Appointments</title>
+</head>
+<body>
+    <h2>Upcoming Appointments</h2>
+    <table border="1">
+        <tr>
+            <th>Patient</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Reason</th>
+        </tr>
+        {% for a in apps %}
+        <tr>
+            <td>{{ a.patient }}</td>
+            <td>{{ a.date }}</td>
+            <td>{{ a.time }}</td>
+            <td>{{ a.reason }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <br>
+    <a href="{{ url_for('medic') }}">Back</a>
+</body>
+</html>
