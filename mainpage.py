@@ -35,26 +35,25 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("flaskKey")
+app.config["SESSION_COOKIE_HTTPONLY"] = True #prevent XSS
 app.config["SESSION_TYPE"] = "redis"
 app.config["SESSION_REDIS"] = red #imported from redisstart
-app.config["SESSION_USE_SIGNER"] = True #adds an encrypted sign to prevent tampering
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=2)
-app.config["SESSION_COOKIE_HTTPONLY"] = True #prevents XSS attacks
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax" #prevents BASIC CSRF attacks
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax" #prevents BASIC CSRF
+app.config["SESSION_USE_SIGNER"] = True #adds an encrypted sign to prevent tampering
 app.config["WTF_CSRF_ENABLED"] = True #better CSRF protection, does not rely on browsers
 
 Session(app)
 csrf = CSRFProtect(app)
-
 iplimiter = Limiter(get_remote_address, app=app, default_limits=["400 per day"])
 
 @app.before_request
 def timeouts():
-    if "username" in session or "mfaname" in session:
+    if "username" in session or "mfaname" in session: #must else mfa will not work
         session.modified = True
     else:
-        if request.endpoint not in ("home","existing","newUser","static","verifyEmail"): #css will break if static not mentioned
+        if request.endpoint not in ("home","existing","newUser","static","verifyEmail"): #css will break if static is not mentioned
             return render_template("Session_Timedout.html")
 
 @app.route("/")
@@ -103,7 +102,7 @@ def existing():
             return redirect(url_for("users"))
                 
         else:
-            session.clear() # prevents session fixation attacks,although flask usually does so by itself
+            session.clear() # prevents session fixation attacks, although flask usually does so by itself
             usermail = login.useremail(name)
             code = otp.createOTP(name)
             emails.sendmail(usermail,"Trying out flask logins",f"pyotp generated code is {code}")
@@ -229,8 +228,7 @@ def verifyEmail(token):
 
 @app.route("/user")
 def users():
-    if "username" not in session: # session is kinda like a dictionary, checks if the session has a username to avoid 
-        #someone just pasting in the link
+    if "username" not in session: 
         return redirect(url_for("home"))
     return render_template("users.html")
 
@@ -239,7 +237,7 @@ def userbooksappointment():
     if "username" not in session or session.get("role") !="user": #show flash message
         return redirect(url_for("home")),403
     
-    docs = dbc.showdocs()
+    docs = dbc.showdocs() #for the drop down
 
     if request.method == "POST":
         doc = request.form.get("doctor")
@@ -303,16 +301,14 @@ def importusers():
         stream = io.StringIO(file.stream.read().decode("utf-8"))
         reader = csv.DictReader(stream)
 
-        success,fail = 0,0
+        added=0
         for i in reader:
             result = register.register(i["username"],i["password"],i["email"])
             if result:
-                success +=1
-            else:
-                fail+=1
+                added +=1
 
-        auditlog.info(f"admin {session["username"]} imported a list of {success} users")
-        return render_template("importusers.html",success=success)
+        auditlog.info(f"admin {session["username"]} imported a list of {added} users")
+        return render_template("importusers.html",success=added)
     
     return render_template("importusers.html")
 
@@ -363,9 +359,8 @@ def admindownloadrecords():
     write.writerow(["Username", "Name", "Age", "Sex", "Blood Pressure", "Cholesterol", "ECG", "Diagnosis", "Medicines", "Notes", "Created", "Updated"])
     for p in patients:
         write.writerow([p.get("_id", ""),p.get("name", ""),p.get("age", ""),p.get("sex", ""),
-                                p.get("bloodPressure", ""),p.get("cholesterol", ""),p.get("restingECG", ""),
-                                p.get("disease", ""),p.get("medicines", ""),p.get("notes", ""),p.get("createdOn", ""),
-                                p.get("updatedOn", "")])
+p.get("bloodPressure", ""),p.get("cholesterol", ""),p.get("restingECG", ""),p.get("disease", ""),p.get("medicines", ""),
+p.get("notes", ""),p.get("createdOn", ""),p.get("updatedOn", "")])
             
     output.seek(0)
     auditlog.info(f"{session["username"]} created a csv of patient records")
@@ -430,13 +425,11 @@ def medseesapps():
 def medEditsData():
     if "username" not in session or session.get("role")!="medical":
         return redirect(url_for("home"))
+    
     if request.method=="POST":
-        data ={
-            "username":request.form["username"],
-            "disease":request.form["disease"],
-            "medicines":request.form["medicines"],
-            "notes":request.form["notes"]
-        }
+        data ={"username":request.form["username"],"disease":request.form["disease"],
+               "medicines":request.form["medicines"],"notes":request.form["notes"]}
+        
         mongoconnect.medAddsData(data)
         return redirect(url_for("medic"))
     return render_template("medic_upload.html")
