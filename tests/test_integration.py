@@ -12,5 +12,5 @@ def test_invalidlogin(client):
     assert test == "Invalid username"
 
 def test_invalidpassword(client):
-    test = login.userlogin("sarahlee", "WrongPass1$")
+    test = login.userlogin("sarahlee", "abcd")
     assert test == "wrong password"

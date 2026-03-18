@@ -4,9 +4,43 @@
     <title>Login</title>
 </head>
 <body>
-<img src="{{ url_for('static', filename='logindog.png') }}" width="200">
-<h2>Login</h2>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        body {
+            font-family: sans-serif;
+            background-color:#3498db;
+            color:blueviolet;
+            padding: 40px 20px;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 26px;
+            color: gainsboro;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        </style>
+
+<h2>Login</h2>
+<div class="container">
+    <img src="{{ url_for('static', filename='welcome.jpeg') }}" width="200">
 <form method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if error %}
@@ -27,5 +61,6 @@
 <br><br>
 
 <a href="{{ url_for('home') }}">Go Home</a>
+</div>
 </body>
 </html>
