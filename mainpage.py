@@ -84,8 +84,18 @@ def existing():
             auditlog.info(f"Account {name} locked, multiple failed attempts")
             faillog.info(f"Multiple failed attempts, lock on user profile {name}")
             return render_template("login.html",error = "Too many failed attempts, retry after 2 mins")
+
+        else:
+            session.clear() # prevents session fixation attacks, although flask usually does so by itself
+            usermail = login.useremail(name)
+            code = otp.createOTP(name)
+            emails.sendmail(usermail,"Trying out flask logins",f"pyotp generated code is {code}")
+            session["mfaname"]=name
+            session["mfarole"]=result.lower()
+            auditlog.info(f"otp sent to {result.lower()} {name}")
+            return redirect(url_for("mfa"))
         
-        elif result.lower()=="medical":
+        '''elif result.lower()=="medical":
             session.clear()
             session["username"]=name
             session["role"]="medical"
@@ -99,17 +109,9 @@ def existing():
             session["role"]="user"
             auditlog.info(f"user {name} has logged in")
             successlog.info(f"Successful login")
-            return redirect(url_for("users"))
+            return redirect(url_for("users"))'''
                 
-        else:
-            session.clear() # prevents session fixation attacks, although flask usually does so by itself
-            usermail = login.useremail(name)
-            code = otp.createOTP(name)
-            emails.sendmail(usermail,"Trying out flask logins",f"pyotp generated code is {code}")
-            session["mfaname"]=name
-            session["mfarole"]=result.lower()
-            auditlog.info(f"otp sent to {result.lower()} {name}")
-            return redirect(url_for("mfa"))
+        
 
         '''elif result.lower() == "admin":
             session.clear() #prevents session fixation even though flask generally takes care of it, industry standard practice

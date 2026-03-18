@@ -1,6 +1,11 @@
-username,password,email
-johndoe,Word123$%,why26104@gmail.com
-janesmith,Word123$%,why26104@gmail.com
-bobdylan,Word123$%,why26104@gmail.com
-sarahlee,Word123$%,why26104@gmail.com
-mikebrown,Word123$%,why26104@gmail.com
+Username,Age,Sex,RestingBP,Cholesterol,RestingECG,HeartDisease,Diagnosis,Medicines,Notes
+emilyclark,52,F,145,265,Normal,1,Type 2 Diabetes,Metformin,Monitor blood sugar weekly
+jameswhite,61,M,158,310,ST,1,Coronary Artery Disease,Aspirin,Follow up in 6 weeks
+oliviabrown,44,F,122,198,Normal,0,Anxiety,Sertraline,Review in 3 months
+williamlee,67,M,172,340,LVH,1,Hypertension,Amlodipine,Reduce salt intake
+sophiamiller,35,F,118,175,Normal,0,Healthy,None,No concerns
+harrywright,58,M,155,290,ST,1,High Cholesterol,Atorvastatin,Avoid fatty foods
+isabellamoore,47,F,132,220,Normal,0,Migraines,Sumatriptan,Rest in dark room during episodes
+georgetaylor,71,M,168,355,LVH,1,Heart Failure,Furosemide,Weigh daily monitor fluid intake
+amandajones,39,F,125,185,Normal,0,Iron Deficiency,Ferrous Sulfate,Take with vitamin C
+robertsmith,55,M,148,275,Normal,1,Angina,Nitroglycerin,Avoid strenuous activity
