@@ -1,6 +1,0 @@
-Username,Age,Sex,RestingBP,Cholesterol,RestingECG,HeartDisease,Diagnosis,Medicines,Notes
-johndoe,40,M,140,289,Normal,0,Fever,Paracetamol,Needs rest
-janesmith,49,F,160,180,Normal,1,Hypertension,Lisinopril,Monitor BP weekly
-bobdylan,37,M,130,283,ST,0,Healthy,None,No concerns
-sarahlee,48,F,138,214,Normal,1,Headaches,Ibuprofen,Rest
-mikebrown,54,M,150,195,Normal,0,Headaches,Ibuprofen,Rest
