@@ -5,14 +5,39 @@
     <title>Verify OTP</title>
 </head>
 <body>
-    
-    <h2>Two-Factor Authentication</h2>
-    <p>An OTP has been sent to your registered email. Valid for 3 minutes.</p>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        body {
+            font-family: sans-serif;
+            background-color:#3498db;
+            color:blueviolet;
+            padding: 40px 20px;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            
+        }
+        </style>
+    
     {% if error %}
         <p style="color:red;">{{ error }}</p>
     {% endif %}
-
+    <div class="container">
+        <h2>Two-Factor Authentication</h2>
+        <br>
+        <p>An OTP has been sent to your registered email. Valid for 3 minutes.</p>
+        <br>
     <form method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label>Enter OTP</label>
@@ -25,5 +50,6 @@
     <a href="{{ url_for('existing') }}">Login again</a>
     <br><br>
     <a href="{{ url_for('home') }}">Home</a>
+    </div>
 </body>
 </html>
