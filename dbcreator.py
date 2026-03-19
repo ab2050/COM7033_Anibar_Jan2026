@@ -1,6 +1,4 @@
-#create the 2 tables
 import psycopg2
-
 def create():
     conn = psycopg2.connect(database= "abcreates",user = "ab",password = "password",host = "localhost",port = "5432")
     return conn #easier to just return it 
