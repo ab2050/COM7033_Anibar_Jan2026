@@ -34,30 +34,22 @@ def patientAddsData(username,name,age,sex):
     patdata.update_one(
         {"_id":username},
         {
-            "$set":{
-                "name":name,
-                "age":age,
-                "sex": sex,
-                "updatedOn":datetime.now()
-            },
+            "$set":{"name":name,"age":age,"sex": sex,"updatedOn":datetime.now()},
             "$setOnInsert":{
-                "createdOn":datetime.now()
-            }
+                "createdOn":datetime.now()}
         },upsert=True) # will only create one record per id
 
 def medAddsData(data):
     patdata.update_one(
         {"_id": data.get("username")},
         {
-            "$set": {
-                "disease": encrypt(data.get("disease")),
+            "$set": {"disease": encrypt(data.get("disease")),
                 "medicines": encrypt(data.get("medicines")),
                 "notes": encrypt(data.get("notes")),
                 "bloodPressure": data.get("bp"),
                 "cholesterol": data.get("cholesterol"),
                 "restingECG": data.get("ecg"),
-                "updatedOn": datetime.now()
-            }
+                "updatedOn": datetime.now()}
         }, upsert=True)
 
 def showpatients():
